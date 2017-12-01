@@ -153,9 +153,7 @@ app.post('/new', function(req,res) {
 	})
 })
 
-// app.get('/display/', function(req,res) {
-//   console.log("display")
-// })
+
 
 app.get('/display/:id', function(req,res) {
 	res.status(200)
