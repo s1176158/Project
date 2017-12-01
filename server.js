@@ -19,9 +19,7 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
-app.get('/', function(req,res) {
-  res.redirect('/login')
-});
+
 
 app.get('/login', function(req,res) {
 	res.status(200)
@@ -35,12 +33,12 @@ app.post('/login', function(req,res) {
 		assert.equal(err,null)
 		console.log('Connected to MongoDB')
 
-		db.collection('user').find({ uid:uid, pw:pw }).each(function(err, result){
+		db.collection('user').find({ uid:uid, pw:pw }).limit( 1 ).each(function(err, result){
       assert.equal(err,null)
 			if(result != null) {
 				console.log("success login")
 				req.session.uid = uid
-				return res.redirect("restaurants")
+				res.redirect("restaurants")
 			}
 			if(!res.headersSent){
 				console.log("login failed")
@@ -84,7 +82,6 @@ app.get('/restaurants', function(req,res) {
             db.close()
             console.log('Disconnected MongoDB')
             res.status(200)
-            console.log(result)
             return res.render("restaurants", {count: count, uid: req.session.uid, result: result})
           }
         )
@@ -140,7 +137,7 @@ app.post('/new', function(req,res) {
        owner: req.session.uid
      },
      function(err, result){
-       assert.equal(err, null);
+       assert.equal(err, null)
 			 if(result != null) {
 				console.log(result)
 				console.log("New restaurants added")
@@ -154,5 +151,36 @@ app.post('/new', function(req,res) {
 
 	})
 })
+
+// app.get('/display/', function(req,res) { //this work fine
+//   console.log("display")
+// })
+
+app.get('/display/:id', function(req,res) { //cannot get
+	res.status(200)
+  console.log(req.params.id)
+	if (req.session.uid != null){
+    MongoClient.connect(mongourl, function (err, db) {
+  		assert.equal(err,null)
+  		console.log('Connected to MongoDB')
+
+  		db.collection('user').find( { _id: req.params._id } ).toArray(
+        function(err, result){
+          assert.equal(err,null)
+          db.close()
+          console.log('Disconnected MongoDB')
+          res.status(200)
+          return res.render("display", {uid: req.session.uid, result: result})
+        }
+      )
+  	})
+	} else {
+		return res.redirect("login")
+	}
+})
+
+app.get('/', function(req,res) {
+  res.redirect('/login')
+});
 
 app.listen(process.env.PORT || 8099)
