@@ -6,6 +6,7 @@ var bodyParser = require('body-parser')
 var assert = require('assert')
 var app = express()
 var mongourl = "mongodb://123:123@ds123956.mlab.com:23956/381pj";
+var ObjectId = require('mongodb').ObjectID
 
 app.set('view engine', 'ejs')
 
@@ -152,20 +153,20 @@ app.post('/new', function(req,res) {
 	})
 })
 
-// app.get('/display/', function(req,res) { //this work fine
+// app.get('/display/', function(req,res) {
 //   console.log("display")
 // })
 
-app.get('/display/:id', function(req,res) { //cannot get
+app.get('/display', function(req,res) {
 	res.status(200)
-  console.log(req.params.id)
+  console.log(req.query.id)
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
   		console.log('Connected to MongoDB')
-
-  		db.collection('user').find( { _id: req.params._id } ).toArray(
+  		db.collection('restaurants').find( { _id: new ObjectId(req.query.id) } ).toArray(
         function(err, result){
+          console.log(result)
           assert.equal(err,null)
           db.close()
           console.log('Disconnected MongoDB')
