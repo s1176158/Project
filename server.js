@@ -104,7 +104,7 @@ app.get('/new', function(req,res) {
 app.post('/new', function(req,res) {
 	res.status(200)
 
-  name     = req.body.Name
+  name     = req.body.name
   cuisine  = req.body.cuisine
   street   = req.body.street
   building = req.body.building
