@@ -29,7 +29,11 @@
       <tbody>
         <% result.forEach(function(result) { %>
         <tr>
+<<<<<<< HEAD
           <th><a href="/display?id=<%= result._id %>"><%= result.name %></a></th>
+=======
+          <th><a href="/display/<%= result._id %>"><%= result.name %></a></th>
+>>>>>>> 85e0995ec5b19b4974371202cc422e13fccb2dd7
         </tr>
         <% });%>
       </tbody>
