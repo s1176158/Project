@@ -27,9 +27,11 @@
         </tr>
       </thead>
       <tbody>
+        <% result.forEach(function(result) { %>
         <tr>
-          <th>1</th>
+          <th><a href="display?_id=<%= result._id %>"><%= result.name %></a></th>
         </tr>
+        <% });%>
       </tbody>
     </table>
   </div>

@@ -77,14 +77,18 @@ app.get('/restaurants', function(req,res) {
   		assert.equal(err,null)
   		console.log('Connected to MongoDB')
 
-  		db.collection('restaurants').find().count({}, function (error, count) {
-        db.close()
-    		console.log('Disconnected MongoDB')
-
-    		res.status(200)
-        return res.render("restaurants", {count: count, uid: req.session.uid})
-      });
-
+  		db.collection('restaurants').find().count().then(function(count){
+        db.collection('restaurants').find({}, {name: 1}).toArray(
+          function(err, result){
+            assert.equal(err,null)
+            db.close()
+            console.log('Disconnected MongoDB')
+            res.status(200)
+            console.log(result)
+            return res.render("restaurants", {count: count, uid: req.session.uid, result: result})
+          }
+        )
+      })
   	})
 
 	} else {
