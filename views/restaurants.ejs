@@ -8,8 +8,30 @@
 
 <body>
   <div class="container">
-    <h1 class="mx-auto">Restaurants</h1>
-    <span>User:<%=uid %></span>
+    <div class="row">
+      <h1 class="mx-auto">Restaurants</h1>
+      <span>User:<%=uid %></span>
+    </div>
+    <div class="row">
+      <span>Showing <%=count %> documents</span>
+    </div>
+  </div>
+  <div class="container">
+    <a href="new" class="btn btn-info">Create New Restaurants</a>
+  </div>
+  <div class="container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>1</th>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </body>
 </html>

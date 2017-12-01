@@ -36,8 +36,8 @@ app.post('/login', function(req,res) {
 		console.log('Connected to MongoDB')
 
 		db.collection('user').find({ uid:uid, pw:pw }).each(function(err, result){
+      assert.equal(err,null)
 			if(result != null) {
-				console.log(result)
 				console.log("success login")
 				req.session.uid = uid
 				return res.redirect("restaurants")
@@ -62,22 +62,93 @@ app.post('/signup', function(req,res) {
 		assert.equal(err,null)
 		console.log('Connected to MongoDB')
 
-		db.collection('user').insert( { uid:uid, pw:pw } )
+		db.collection('user').insertOne( { uid:uid, pw:pw } )
 		db.close()
 		console.log('Disconnected MongoDB')
 
 		res.status(200)
-    res.render("login")
+    res.redirect("login")
 	})
 })
 
 app.get('/restaurants', function(req,res) {
+	if (req.session.uid != null){
+    MongoClient.connect(mongourl, function (err, db) {
+  		assert.equal(err,null)
+  		console.log('Connected to MongoDB')
+
+  		db.collection('restaurants').find().count({}, function (error, count) {
+        db.close()
+    		console.log('Disconnected MongoDB')
+
+    		res.status(200)
+        return res.render("restaurants", {count: count, uid: req.session.uid})
+      });
+
+  	})
+
+	} else {
+		return res.redirect("login")
+	}
+})
+
+app.get('/new', function(req,res) {
 	res.status(200)
 	if (req.session.uid != null){
-		return(res.render("restaurants", {uid: req.session.uid}));
+		return res.render("new")
 	} else {
-		return(res.redirect("login"));
+		return res.redirect("login")
 	}
+})
+
+app.post('/new', function(req,res) {
+	res.status(200)
+
+  name     = req.body.Name
+  cuisine  = req.body.cuisine
+  street   = req.body.street
+  building = req.body.building
+  zipcode  = req.body.zipcode
+  lon      = req.body.lon
+  lat      = req.body.lat
+
+  MongoClient.connect(mongourl, function (err, db) {
+		assert.equal(err,null)
+		console.log('Connected to MongoDB')
+
+		db.collection('restaurants').insertOne({
+       name: name,
+       cuisine: cuisine,
+       borough: null,
+       photo: null,
+       photomimetype: null,
+       address: {
+         street: street,
+         building: building,
+         zipcode: zipcode,
+         coord: {
+           lon: lon,
+           lat: lat
+         }
+       },
+       grades: {
+       },
+       owner: req.session.uid
+     },
+     function(err, result){
+       assert.equal(err, null);
+			 if(result != null) {
+				console.log(result)
+				console.log("New restaurants added")
+				return res.redirect("restaurants")
+			 }
+			if(!res.headersSent){
+				console.log("Restaurants cannot be added")
+				res.redirect("restaurants")
+			}
+		})
+
+	})
 })
 
 app.listen(process.env.PORT || 8099)
