@@ -157,14 +157,14 @@ app.post('/new', function(req,res) {
 //   console.log("display")
 // })
 
-app.get('/display', function(req,res) {
+app.get('/display/:id', function(req,res) {
 	res.status(200)
-  console.log(req.query.id)
+	console.log(req.params.id)
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
   		console.log('Connected to MongoDB')
-  		db.collection('restaurants').find( { _id: new ObjectId(req.query.id) } ).toArray(
+  		db.collection('restaurants').find( { _id: new ObjectId(req.params.id) } ).toArray(
         function(err, result){
           console.log(result)
           assert.equal(err,null)
