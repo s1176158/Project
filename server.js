@@ -202,7 +202,7 @@ app.get('/delete/:id', function(req,res) {
 				
 			}
 			else{
-				
+				console.log('Unauthorized request')
 				db.close();
 				console.log('Disconnected mongoDB');
 				return res.render("unauthorized");
