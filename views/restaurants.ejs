@@ -29,7 +29,7 @@
       <tbody>
         <% result.forEach(function(result) { %>
         <tr>
-          <th><a href="/display/<%= result._id %>"><%= result.name %></a></th>
+          <th><a href="/display?id=<%= result._id %>"><%= result.name %></a></th>
         </tr>
         <% });%>
       </tbody>

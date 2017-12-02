@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Update</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <h1 class="mx-auto">Update Restaurants</h1>
+    </div>
+  </div>
+  <div class="container">
+    <form action="#" method="post" encType="multipart/form-data">
+      <div class="row">
+        <div class="input-group">
+          Name:
+          <input type="text" class="form-control" value="<%=result[0].name %>" name="name"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-group">
+          Cuisine:
+          <input type="text" class="form-control" value="<%=result[0].cuisine %>" name="cuisine"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-group">
+          Street:
+          <input type="text" class="form-control" value="<%=result[0].address.street %>" name="street"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-group">
+          Building:
+          <input type="text" class="form-control" value="<%=result[0].address.building %>" name="building"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-group">
+          Zipcode:
+          <input type="text" class="form-control" value="<%=result[0].address.zipcode %>" name="zipcode"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-group">
+          GPS Coordinates (lat.):
+          <input type="text" class="form-control" value="<%=result[0].address.coord.lat %>" name="lat"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-group">
+          GPS Coordinates (lon.):
+          <input type="text" class="form-control" value="<%=result[0].address.coord.lon %>" name="lon"/>
+        </div>
+      </div>
+      <input type="hidden" class="form-control" value="<%=result[0]._id %>" name="id"/>
+      <div class="row">
+        <div class="input-group">
+          Photo:
+          <input type="file" name="photo"/>
+        </div>
+      </div>
+      <div class="row">
+          <button type="submit" class="btn btn-info">Update</button>
+      </div>
+    </form>
+  </div>
+  <div class="container">
+  </div>
+</body>
+</html>

@@ -168,13 +168,12 @@ app.post('/new', function(req,res) {
   })
 })
 
-app.get('/display/:id', function(req,res) {
-	console.log(req.params.id)
+app.get('/display', function(req,res) {
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
   		console.log('Connected to MongoDB')
-  		db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
+  		db.collection('restaurants').find( { _id: ObjectId(req.query.id) } ).toArray(
         function(err, result){
           console.log(result)
           assert.equal(err,null)
@@ -190,20 +189,99 @@ app.get('/display/:id', function(req,res) {
 	}
 })
 
-app.get('/delete/:id', function(req,res) {
+app.get('/update', function(req,res) {
+  MongoClient.connect(mongourl, function (err, db) {
+    assert.equal(err,null)
+    console.log('Connected to MongoDB')
+    db.collection('restaurants').find( { _id: ObjectId(req.query.id) } ).toArray(
+      function(err, result){
+        assert.equal(err,null)
+        db.close()
+        console.log('Disconnected MongoDB')
+        res.status(200)
+        return res.render("update", {uid: req.session.uid, result: result})
+      }
+    )
+  })
+})
+
+app.post('/update', function(req,res) {
+  name     = req.body.name
+  cuisine  = req.body.cuisine
+  street   = req.body.street
+  building = req.body.building
+  zipcode  = req.body.zipcode
+  lon      = req.body.lon
+  lat      = req.body.lat
+  id       = req.body.id
+
+  photomimetype = null
+  base64str = null
+
+  if (req.files.photo){
+    photomimetype = req.files.photo.mimetype
+    photoname = req.files.photo.name
+    photo    = req.files.photo
+
+    photo.mv('photo/'+ photoname, function(err) { // temp save photo in folder
+      if (err) {
+        return res.status(500).send(err)
+      }
+      console.log('Photo uploaded!')
+      base64str = base64_encode('photo/'+ photoname);
+      fs.unlink('photo/'+ photoname) //delete image in case of duplicate file name
+    })
+  }
+  MongoClient.connect(mongourl, function (err, db) {
+    assert.equal(err,null)
+    console.log('Connected to MongoDB')
+
+    db.collection('restaurants').update({ _id: ObjectId(req.body.id)},{
+      $set: {
+       name: name,
+       cuisine: cuisine,
+       borough: null,
+       photo: base64str,
+       photomimetype: photomimetype,
+       address: {
+         street: street,
+         building: building,
+         zipcode: zipcode,
+         coord: {
+           lon: lon,
+           lat: lat
+         }
+       }
+     }
+   },
+     function(err, result){
+       assert.equal(err, null)
+       if(result != null) {
+        console.log("Restaurant updated")
+        return res.redirect("display?id="+req.body.id)
+       }
+      if(!res.headersSent){
+        console.log("Restaurants cannot be added")
+        res.redirect("display?id="+req.body.id)
+      }
+    })
+  })
+})
+
+app.get('/delete', function(req,res) {
 	res.status(200)
-	console.log('delete request from '+req.session.uid+' : '+req.params.id)
+	console.log('delete request from '+req.session.uid+' : '+req.query.id)
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
   		console.log('Connected to MongoDB')
-  		db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
+  		db.collection('restaurants').find( { _id: ObjectId(req.query.id) } ).toArray(
         function(err, result){
 
 			console.log('owner : '+result[0].owner)
 
 			if(result[0].owner == req.session.uid){
-				db.collection('restaurants').deleteOne( { _id: ObjectId(req.params.id) } , function(err,result){
+				db.collection('restaurants').deleteOne( { _id: ObjectId(req.query.id) } , function(err,result){
 					assert.equal(null,err)
 					console.log('restaurant deleted')
 					db.close()
