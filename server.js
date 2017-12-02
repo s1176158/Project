@@ -157,17 +157,21 @@ app.post('/new', function(req,res) {
 	})
 })
 
-// app.get('/display/', function(req,res) {
-//   console.log("display")
-// })
 
+<<<<<<< HEAD
 app.get('/display', function(req,res) {
   console.log(req.query.id)
+=======
+
+app.get('/display/:id', function(req,res) {
+	res.status(200)
+	console.log(req.params.id)
+>>>>>>> 8cf3e168d2ec864f3e0c33d9d1f25e4bf5916608
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
   		console.log('Connected to MongoDB')
-  		db.collection('restaurants').find( { _id: new ObjectId(req.query.id) } ).toArray(
+  		db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
         function(err, result){
           console.log(result)
           assert.equal(err,null)
@@ -175,6 +179,44 @@ app.get('/display', function(req,res) {
           console.log('Disconnected MongoDB')
           res.status(200)
           return res.render("display", {uid: req.session.uid, result: result})
+        }
+      )
+  	})
+	} else {
+		return res.redirect("login")
+	}
+})
+
+app.get('/delete/:id', function(req,res) {
+	res.status(200)
+	console.log(req.params.id)
+	if (req.session.uid != null){
+    MongoClient.connect(mongourl, function (err, db) {
+  		assert.equal(err,null)
+  		console.log('Connected to MongoDB')
+  		db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
+        function(err, result){
+			
+			console.log(result[0].owner)
+			console.log(req.session.uid)
+			
+			if(result[0].owner == req.session.uid){
+				db.collection('restaurants').deleteOne( { _id: ObjectId(req.params.id) } , function(err,result){
+					assert.equal(null,err)
+					console.log('restaurant deleted')
+					db.close()
+					console.log('Disconnected mongoDB')
+					return res.render("deleted")
+				})
+				
+			}
+			else{
+				console.log('Unauthorized request')
+				db.close();
+				console.log('Disconnected mongoDB');
+				return res.render("unauthorized");
+			}
+          
         }
       )
   	})
