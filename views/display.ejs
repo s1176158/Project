@@ -4,6 +4,12 @@
 <head>
   <title><%=result[0].name %></title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+     }
+  </style>
 </head>
 
 <body>
@@ -39,10 +45,31 @@
     <div class="row">
       <span>Created by: <%=result[0].owner %></span>
     </div>
-	<div class="row">
+    <input id="lat" type="hidden" value="<%=result[0].address.coord.lat %>">
+    <input id="lon" type="hidden" value="<%=result[0].address.coord.lon %>">
+    <div id="map">
+      <script>
+      function initMap() {
+        if (document.getElementById("lat").value == "" or document.getElementById("lon").value == ""){
+           return
+         }
+        var location = {lat: parseFloat(<%=result[0].address.coord.lat %>), lng: parseFloat(<%=result[0].address.coord.lon %>)};
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 13,
+          center: location
+        });
+        var marker = new google.maps.Marker({
+          position: location,
+          map: map
+        });
+      }
+      </script>
+    </div>
+	  <div class="row">
       <a href="../delete/<%=result[0]._id %>" class="btn btn-info">Delete</a>
     </div>
   </div>
-
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFBDczwsfFy8czzC7k7Ya2pC0Pjjm2eo4&callback=initMap"></script>
 </body>
 </html>
