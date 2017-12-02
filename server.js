@@ -7,6 +7,8 @@ var assert = require('assert')
 var app = express()
 var mongourl = "mongodb://123:123@ds123956.mlab.com:23956/381pj";
 var ObjectId = require('mongodb').ObjectID
+var fs = require('fs')
+var formidable = require('formidable')
 
 app.set('view engine', 'ejs')
 
@@ -19,8 +21,6 @@ app.use(cookieSession({
 	keys: ['key'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
-
-
 
 app.get('/login', function(req,res) {
 	res.status(200)
@@ -113,60 +113,58 @@ app.post('/new', function(req,res) {
   zipcode  = req.body.zipcode
   lon      = req.body.lon
   lat      = req.body.lat
-  photo    = req.files.photo
   photomimetype = req.files.photo.mimetype
+  photoname = req.files.photo.name
+  photo    = req.files.photo
 
-  photo.mv('/photo/')
+  photo.mv('photo/'+ photoname, function(err) { // temp save photo in folder
+    if (err) {
+      return res.status(500).send(err)
+    }
+    console.log('Photo uploaded!')
+    var base64str = base64_encode('photo/'+ photoname);
+    fs.unlink('photo/'+ photoname) //delete image in case of duplicate file name
+    MongoClient.connect(mongourl, function (err, db) {
+  		assert.equal(err,null)
+  		console.log('Connected to MongoDB')
 
-  MongoClient.connect(mongourl, function (err, db) {
-		assert.equal(err,null)
-		console.log('Connected to MongoDB')
-
-		db.collection('restaurants').insertOne({
-       name: name,
-       cuisine: cuisine,
-       borough: null,
-       photo: null,
-       photomimetype: null,
-       address: {
-         street: street,
-         building: building,
-         zipcode: zipcode,
-         coord: {
-           lon: lon,
-           lat: lat
-         }
+  		db.collection('restaurants').insertOne({
+         name: name,
+         cuisine: cuisine,
+         borough: null,
+         photo: base64str,
+         photomimetype: photomimetype,
+         address: {
+           street: street,
+           building: building,
+           zipcode: zipcode,
+           coord: {
+             lon: lon,
+             lat: lat
+           }
+         },
+         grades: {
+         },
+         owner: req.session.uid
        },
-       grades: {
-       },
-       owner: req.session.uid
-     },
-     function(err, result){
-       assert.equal(err, null)
-			 if(result != null) {
-				console.log(result)
-				console.log("New restaurants added")
-				return res.redirect("restaurants")
-			 }
-			if(!res.headersSent){
-				console.log("Restaurants cannot be added")
-				res.redirect("restaurants")
-			}
-		})
+       function(err, result){
+         assert.equal(err, null)
+  			 if(result != null) {
+  				console.log("New restaurants added")
+  				return res.redirect("restaurants")
+  			 }
+  			if(!res.headersSent){
+  				console.log("Restaurants cannot be added")
+  				res.redirect("restaurants")
+  			}
+  		})
 
-	})
+  	})
+  })
 })
 
-
-<<<<<<< HEAD
-app.get('/display', function(req,res) {
-  console.log(req.query.id)
-=======
-
 app.get('/display/:id', function(req,res) {
-	res.status(200)
 	console.log(req.params.id)
->>>>>>> 8cf3e168d2ec864f3e0c33d9d1f25e4bf5916608
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
@@ -188,7 +186,6 @@ app.get('/display/:id', function(req,res) {
 })
 
 app.get('/delete/:id', function(req,res) {
-	res.status(200)
 	console.log(req.params.id)
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
@@ -196,27 +193,29 @@ app.get('/delete/:id', function(req,res) {
   		console.log('Connected to MongoDB')
   		db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
         function(err, result){
-			
+
 			console.log(result[0].owner)
 			console.log(req.session.uid)
-			
+
 			if(result[0].owner == req.session.uid){
 				db.collection('restaurants').deleteOne( { _id: ObjectId(req.params.id) } , function(err,result){
 					assert.equal(null,err)
 					console.log('restaurant deleted')
 					db.close()
 					console.log('Disconnected mongoDB')
+        	res.status(200)
 					return res.render("deleted")
 				})
-				
+
 			}
 			else{
 				console.log('Unauthorized request')
 				db.close();
 				console.log('Disconnected mongoDB');
+        res.status(200)
 				return res.render("unauthorized");
 			}
-          
+
         }
       )
   	})
@@ -230,3 +229,10 @@ app.get('/', function(req,res) {
 });
 
 app.listen(process.env.PORT || 8099)
+
+function base64_encode(file) {
+    // read binary data
+    var bitmap = fs.readFileSync(file);
+    // convert binary data to base64 encoded string
+    return new Buffer(bitmap).toString('base64');
+}

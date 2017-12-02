@@ -15,6 +15,10 @@
     "ejs": "^2.5.7",
     "express": "^4.16.2",
     "express-fileupload": "^0.3.0",
-    "mongodb": "^2.2.33"
+    "formidable": "^1.1.1",
+    "fs": "0.0.1-security",
+    "jquery": "^3.2.1",
+    "mongodb": "^2.2.33",
+    "popper.js": "^1.12.9"
   }
 }
