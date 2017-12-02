@@ -150,8 +150,8 @@ app.post('/new', function(req,res) {
            lat: lat
          }
        },
-       grades: {
-       },
+       grades: [],
+
        owner: req.session.uid
      },
      function(err, result){
@@ -306,6 +306,74 @@ app.get('/delete', function(req,res) {
 		return res.redirect("login")
 	}
 })
+
+app.get('/grade/:id', function(req,res) {
+  if (req.session.uid != null){
+    MongoClient.connect(mongourl, function (err, db) {
+      assert.equal(err,null)
+      console.log('Connected to MongoDB')
+      db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
+      function(err, result){
+        db.close()
+        console.log(result[0].name)
+        console.log('Disconnected MongoDB')
+
+        return res.render("grade",{name: result[0].name, id: req.params.id })
+      })
+  })
+} else {
+    return res.redirect("login")
+  }
+
+});
+
+app.post('/grade/:id', function(req,res) {
+  if (req.session.uid != null){
+
+    rating = req.body.rating
+
+
+    MongoClient.connect(mongourl, function (err, db) {
+      assert.equal(err,null)
+      console.log('Connected to MongoDB')
+      db.collection('restaurants').findOne( { "_id": ObjectId(req.params.id),"grades.uid":req.session.uid },
+        function(err, result){
+
+
+      if(!result){
+
+        db.collection('restaurants').update({ _id: ObjectId(req.params.id) },
+                        {
+                         $push: { grades: { "uid" : req.session.uid ,
+                         "rating" : rating,
+                          } }
+                        },function(err,result){
+                          assert.equal(null,err)
+                          console.log('Grading success')
+                          db.close()
+                          console.log('Disconnected mongoDB')
+                          res.status(200)
+                          return res.render("rated",{id:req.params.id})
+                        })
+
+
+
+      }
+      else{
+        console.log('Already rated')
+        db.close();
+        console.log('Disconnected mongoDB');
+        res.status(200)
+        return res.render("alreadyrated",{id:req.params.id});
+      }
+
+        }
+
+    )})
+  } else {
+    return res.redirect("login")
+  }
+});
 
 app.get('/', function(req,res) {
   res.redirect('/login')
