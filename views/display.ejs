@@ -67,10 +67,15 @@
       </script>
     </div>
 	  <div class="row">
-      <a href="../delete/<%=result[0]._id %>" class="btn btn-info">Delete</a>
-    </div>
-    <div class="row">
-      <a href="../update/<%=result[0]._id %>" class="btn btn-info">Update</a>
+        <div class="column">
+          <a href="../delete/<%=result[0]._id %>" class="btn btn-info">Delete</a>
+        </div>
+        <div class="column">
+          <a href="../update/<%=result[0]._id %>" class="btn btn-info">Update</a>
+        </div>
+        <div class="column">
+          <a href="../grade/<%=result[0]._id %>" class="btn btn-info">Rate</a>
+        </div>
     </div>
   </div>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFBDczwsfFy8czzC7k7Ya2pC0Pjjm2eo4&callback=initMap"></script>
