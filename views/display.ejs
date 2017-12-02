@@ -14,7 +14,9 @@
   </div>
   <div class="container">
     <div class="row">
+      <% if (result[0].photo != null){ %>
       <img src="data:<%=result[0].photomimetype %>;base64, <%=result[0].photo %>">
+      <% } %>
     </div>
     <div class="row">
       <span>Borough: <%=result[0].borough %></span>
