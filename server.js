@@ -113,6 +113,10 @@ app.post('/new', function(req,res) {
   zipcode  = req.body.zipcode
   lon      = req.body.lon
   lat      = req.body.lat
+  photo    = req.files.photo
+  photomimetype = req.files.photo.mimetype
+
+  photo.mv('/photo/')
 
   MongoClient.connect(mongourl, function (err, db) {
 		assert.equal(err,null)
@@ -158,7 +162,6 @@ app.post('/new', function(req,res) {
 // })
 
 app.get('/display', function(req,res) {
-	res.status(200)
   console.log(req.query.id)
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
