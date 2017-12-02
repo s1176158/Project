@@ -113,6 +113,10 @@ app.post('/new', function(req,res) {
   zipcode  = req.body.zipcode
   lon      = req.body.lon
   lat      = req.body.lat
+  photo    = req.files.photo
+  photomimetype = req.files.photo.mimetype
+
+  photo.mv('/photo/')
 
   MongoClient.connect(mongourl, function (err, db) {
 		assert.equal(err,null)
@@ -154,10 +158,15 @@ app.post('/new', function(req,res) {
 })
 
 
+<<<<<<< HEAD
+app.get('/display', function(req,res) {
+  console.log(req.query.id)
+=======
 
 app.get('/display/:id', function(req,res) {
 	res.status(200)
 	console.log(req.params.id)
+>>>>>>> 8cf3e168d2ec864f3e0c33d9d1f25e4bf5916608
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
