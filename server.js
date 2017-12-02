@@ -180,7 +180,7 @@ app.get('/display/:id', function(req,res) {
 
 app.get('/delete/:id', function(req,res) {
 	res.status(200)
-	console.log(req.params.id)
+	console.log('delete request from '+req.session.uid+' : '+req.params.id)
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
@@ -188,9 +188,8 @@ app.get('/delete/:id', function(req,res) {
   		db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
         function(err, result){
 			
-			console.log(result[0].owner)
-			console.log(req.session.uid)
-			
+			console.log('owner : '+result[0].owner)
+						
 			if(result[0].owner == req.session.uid){
 				db.collection('restaurants').deleteOne( { _id: ObjectId(req.params.id) } , function(err,result){
 					assert.equal(null,err)
