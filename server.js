@@ -163,8 +163,18 @@ app.post('/new', function(req,res) {
   })
 })
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> d64d32ee171ddc21d55e0340bf2dfb8a767f7b22
 app.get('/display/:id', function(req,res) {
 	console.log(req.params.id)
+<<<<<<< HEAD
+=======
+
+>>>>>>> d64d32ee171ddc21d55e0340bf2dfb8a767f7b22
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
@@ -186,7 +196,12 @@ app.get('/display/:id', function(req,res) {
 })
 
 app.get('/delete/:id', function(req,res) {
+<<<<<<< HEAD
 	console.log(req.params.id)
+=======
+	res.status(200)
+	console.log('delete request from '+req.session.uid+' : '+req.params.id)
+>>>>>>> d64d32ee171ddc21d55e0340bf2dfb8a767f7b22
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
@@ -194,8 +209,12 @@ app.get('/delete/:id', function(req,res) {
   		db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
         function(err, result){
 
+<<<<<<< HEAD
 			console.log(result[0].owner)
 			console.log(req.session.uid)
+=======
+			console.log('owner : '+result[0].owner)
+>>>>>>> d64d32ee171ddc21d55e0340bf2dfb8a767f7b22
 
 			if(result[0].owner == req.session.uid){
 				db.collection('restaurants').deleteOne( { _id: ObjectId(req.params.id) } , function(err,result){
