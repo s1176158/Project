@@ -158,15 +158,12 @@ app.post('/new', function(req,res) {
 })
 
 
-<<<<<<< HEAD
-app.get('/display', function(req,res) {
-  console.log(req.query.id)
-=======
+
 
 app.get('/display/:id', function(req,res) {
 	res.status(200)
 	console.log(req.params.id)
->>>>>>> 8cf3e168d2ec864f3e0c33d9d1f25e4bf5916608
+
 	if (req.session.uid != null){
     MongoClient.connect(mongourl, function (err, db) {
   		assert.equal(err,null)
@@ -196,9 +193,9 @@ app.get('/delete/:id', function(req,res) {
   		console.log('Connected to MongoDB')
   		db.collection('restaurants').find( { _id: ObjectId(req.params.id) } ).toArray(
         function(err, result){
-			
+
 			console.log('owner : '+result[0].owner)
-						
+
 			if(result[0].owner == req.session.uid){
 				db.collection('restaurants').deleteOne( { _id: ObjectId(req.params.id) } , function(err,result){
 					assert.equal(null,err)
@@ -207,7 +204,7 @@ app.get('/delete/:id', function(req,res) {
 					console.log('Disconnected mongoDB')
 					return res.render("deleted")
 				})
-				
+
 			}
 			else{
 				console.log('Unauthorized request')
@@ -215,7 +212,7 @@ app.get('/delete/:id', function(req,res) {
 				console.log('Disconnected mongoDB');
 				return res.render("unauthorized");
 			}
-          
+
         }
       )
   	})
