@@ -40,6 +40,21 @@
       <span>Zipcode: <%=result[0].address.zipcode %></span>
     </div>
     <div class="row">
+      <div class="column">
+        <span>Grades: </br></span>
+      </div>
+      <div class="column">
+        <% var grades = result[0].grades;
+           var i = 1;
+        grades.forEach(function(grades){ %>
+        <span><%=i %>.  <%=grades.uid %>---<%=grades.rating %>points</span></br>
+        <%
+          i+=1 }) %>
+
+
+      </div>
+    </div>
+    <div class="row">
       <span>GPS: [ <%=result[0].address.coord.lat %>, <%=result[0].address.coord.lon %> ]</span>
     </div>
     <div class="row">
