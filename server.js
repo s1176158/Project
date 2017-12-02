@@ -113,53 +113,58 @@ app.post('/new', function(req,res) {
   zipcode  = req.body.zipcode
   lon      = req.body.lon
   lat      = req.body.lat
-  photomimetype = req.files.photo.mimetype
-  photoname = req.files.photo.name
-  photo    = req.files.photo
 
-  photo.mv('photo/'+ photoname, function(err) { // temp save photo in folder
-    if (err) {
-      return res.status(500).send(err)
-    }
-    console.log('Photo uploaded!')
-    var base64str = base64_encode('photo/'+ photoname);
-    fs.unlink('photo/'+ photoname) //delete image in case of duplicate file name
-    MongoClient.connect(mongourl, function (err, db) {
-  		assert.equal(err,null)
-  		console.log('Connected to MongoDB')
+  photomimetype = null
+  base64str = null
 
-  		db.collection('restaurants').insertOne({
-         name: name,
-         cuisine: cuisine,
-         borough: null,
-         photo: base64str,
-         photomimetype: photomimetype,
-         address: {
-           street: street,
-           building: building,
-           zipcode: zipcode,
-           coord: {
-             lon: lon,
-             lat: lat
-           }
-         },
-         grades: {
-         },
-         owner: req.session.uid
+  if (req.files.photo){
+    photomimetype = req.files.photo.mimetype
+    photoname = req.files.photo.name
+    photo    = req.files.photo
+
+    photo.mv('photo/'+ photoname, function(err) { // temp save photo in folder
+      if (err) {
+        return res.status(500).send(err)
+      }
+      console.log('Photo uploaded!')
+      base64str = base64_encode('photo/'+ photoname);
+      fs.unlink('photo/'+ photoname) //delete image in case of duplicate file name
+    })
+  }
+  MongoClient.connect(mongourl, function (err, db) {
+    assert.equal(err,null)
+    console.log('Connected to MongoDB')
+
+    db.collection('restaurants').insertOne({
+       name: name,
+       cuisine: cuisine,
+       borough: null,
+       photo: base64str,
+       photomimetype: photomimetype,
+       address: {
+         street: street,
+         building: building,
+         zipcode: zipcode,
+         coord: {
+           lon: lon,
+           lat: lat
+         }
        },
-       function(err, result){
-         assert.equal(err, null)
-  			 if(result != null) {
-  				console.log("New restaurants added")
-  				return res.redirect("restaurants")
-  			 }
-  			if(!res.headersSent){
-  				console.log("Restaurants cannot be added")
-  				res.redirect("restaurants")
-  			}
-  		})
-
-  	})
+       grades: {
+       },
+       owner: req.session.uid
+     },
+     function(err, result){
+       assert.equal(err, null)
+       if(result != null) {
+        console.log("New restaurants added")
+        return res.redirect("restaurants")
+       }
+      if(!res.headersSent){
+        console.log("Restaurants cannot be added")
+        res.redirect("restaurants")
+      }
+    })
   })
 })
 
