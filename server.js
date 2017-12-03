@@ -226,28 +226,6 @@ else{
 })
 
 app.post('/update', function(req,res) {
-  MongoClient.connect(mongourl, function (err, db) {
-    assert.equal(err,null)
-    console.log('Connected to MongoDB')
-
-    db.collection('restaurants').find( { _id: ObjectId(req.body.id) } ).toArray(
-      function(err, result){
-
-    console.log('owner : '+result[0].owner)
-
-    if(result[0].owner == req.session.uid){
-
-
-  name     = req.body.name
-  cuisine  = req.body.cuisine
-  borough  = req.body.borough
-  street   = req.body.street
-  building = req.body.building
-  zipcode  = req.body.zipcode
-  lon      = req.body.lon
-  lat      = req.body.lat
-  id       = req.body.id
-
   photomimetype = null
   base64str = null
 
@@ -266,6 +244,26 @@ app.post('/update', function(req,res) {
     })
   }
 
+  MongoClient.connect(mongourl, function (err, db) {
+    assert.equal(err,null)
+    console.log('Connected to MongoDB')
+
+    db.collection('restaurants').find( { _id: ObjectId(req.body.id) } ).toArray(
+      function(err, result){
+
+    console.log('owner : '+result[0].owner)
+
+    if(result[0].owner == req.session.uid){
+
+    name     = req.body.name
+    cuisine  = req.body.cuisine
+    borough  = req.body.borough
+    street   = req.body.street
+    building = req.body.building
+    zipcode  = req.body.zipcode
+    lon      = req.body.lon
+    lat      = req.body.lat
+    id       = req.body.id
 
     db.collection('restaurants').update({ _id: ObjectId(req.body.id)},{
       $set: {
