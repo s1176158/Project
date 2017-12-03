@@ -69,16 +69,18 @@ app.post('/signup', function(req,res) {
       if (count == 0) {
         console.log(count)
     		db.collection('user').insertOne( { uid:uid, pw:pw }, function(err, result){
-          console.log("New Account: "+ uid)
+          assert.equal(err,null)
+        	db.close()
+        	console.log('Disconnected MongoDB')
+          console.log("New Account: "+ uid, pw)
         	res.status(200)
           return res.redirect("login")
         })
-      }
-      console.log("Name already used")
-      return res.redirect("signup")
+      } else{
+        console.log("Name already used")
+        return res.redirect("signup")
+    }
     })
-  	db.close()
-  	console.log('Disconnected MongoDB')
   })
 })
 
