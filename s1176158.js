@@ -51,7 +51,7 @@ app.post('/login', function(req,res) {
 
 app.get('/signup', function(req,res) {
 	res.status(200)
-	res.render("signup")
+	res.render("signup",{msg: null})
 })
 
 app.post('/signup', function(req,res) {
@@ -59,7 +59,8 @@ app.post('/signup', function(req,res) {
 	pw = req.body.pw
   if(!uid || !pw){
     console.log("Null name or pw")
-    return res.redirect("signup")
+    return res.render("signup",{msg: "username or password missing"})
+
   }
 	MongoClient.connect(mongourl, function (err, db) {
 		assert.equal(err,null)
@@ -78,7 +79,7 @@ app.post('/signup', function(req,res) {
         })
       } else{
         console.log("Name already used")
-        return res.redirect("signup")
+        return res.render("signup",{msg: "username already exists"})
     }
     })
   })
