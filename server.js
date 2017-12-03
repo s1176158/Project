@@ -108,6 +108,7 @@ app.post('/new', function(req,res) {
 
   name     = req.body.name
   cuisine  = req.body.cuisine
+  borough  = req.body.borough
   street   = req.body.street
   building = req.body.building
   zipcode  = req.body.zipcode
@@ -138,7 +139,7 @@ app.post('/new', function(req,res) {
     db.collection('restaurants').insertOne({
        name: name,
        cuisine: cuisine,
-       borough: null,
+       borough: borough,
        photo: base64str,
        photomimetype: photomimetype,
        address: {
@@ -208,6 +209,7 @@ app.get('/update', function(req,res) {
 app.post('/update', function(req,res) {
   name     = req.body.name
   cuisine  = req.body.cuisine
+  borough  = req.body.borough
   street   = req.body.street
   building = req.body.building
   zipcode  = req.body.zipcode
@@ -240,7 +242,7 @@ app.post('/update', function(req,res) {
       $set: {
        name: name,
        cuisine: cuisine,
-       borough: null,
+       borough: borough,
        photo: base64str,
        photomimetype: photomimetype,
        address: {
