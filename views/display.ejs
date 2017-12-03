@@ -21,7 +21,7 @@
   <div class="container">
     <div class="row">
       <% if (result[0].photo != null){ %>
-      <img src="data:<%=result[0].photomimetype %>;base64, <%=result[0].photo %>">
+      <img style=" max-height:600px;max-width:1100px;height:auto;width:auto;" src="data:<%=result[0].photomimetype %>;base64, <%=result[0].photo %>">
       <% } %>
     </div>
     <div class="row">
