@@ -379,6 +379,43 @@ app.post('/grade', function(req,res) {
   }
 })
 
+app.get('/search', function(req, res){
+  name = req.query.name
+  borough = req.query.borough
+  cuisine = req.query.cuisine
+  json = {}
+  if(name){
+    json.name = name
+  }
+  if(borough){
+    json.borough = borough
+  }
+  if(cuisine){
+    json.cuisine = cuisine
+  }
+  if (req.session.uid != null){
+    MongoClient.connect(mongourl, function (err, db) {
+  		assert.equal(err,null)
+  		console.log('Connected to MongoDB')
+
+  		db.collection('restaurants').find(json).count().then(function(count){
+        db.collection('restaurants').find(json, {name: 1}).toArray(
+          function(err, result){
+            assert.equal(err,null)
+            db.close()
+            console.log('Disconnected MongoDB')
+            res.status(200)
+            return res.render("restaurants", {count: count, uid: req.session.uid, result: result})
+          }
+        )
+      })
+  	})
+
+	} else {
+		return res.redirect("login")
+	}
+})
+
 app.post('/api/restaurant/create', function(req,res) {
   new Promise(function (resolve, reject) {
     addRestaurant(req, resolve, reject)
@@ -402,10 +439,10 @@ app.get('/api/restaurant/read/:para1/:para2', function(req,res) {
     case "name":
     case "borough":
     case "cuisine":
-      find = {[para1]: para2}
+      json = {[para1]: para2}
       MongoClient.connect(mongourl, function (err, db) {
         assert.equal(err,null)
-        db.collection('restaurants').find(find).toArray(function(err, result){
+        db.collection('restaurants').find(json).toArray(function(err, result){
           if(err != null){
             res.send({})
           }
