@@ -381,6 +381,29 @@ app.post('/api/restaurant/create', function(req,res) {
         })
 })
 
+app.get('/api/restaurant/read/:para1/:para2', function(req,res) {
+  para1 = req.params.para1
+  para2 = req.params.para2
+  switch (para1) {
+    case "name":
+    case "borough":
+    case "cuisine":
+      find = {[para1]: para2}
+      MongoClient.connect(mongourl, function (err, db) {
+        assert.equal(err,null)
+        db.collection('restaurants').find(find).toArray(function(err, result){
+          if(err != null){
+            res.send({})
+          }
+          res.send(data)
+        })
+      })
+      break;
+    default:
+      res.send({})
+  }
+})
+
 app.get('/', function(req,res) {
   res.redirect('/login')
 })
