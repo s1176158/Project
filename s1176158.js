@@ -481,7 +481,7 @@ app.get('/api/restaurant/read/:para1/:para2', function(req,res) {
           if(err != null){
             res.send({})
           }
-          res.send(data)
+          res.send(result)
         })
       })
       break;
