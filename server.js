@@ -358,14 +358,23 @@ app.post('/grade', function(req,res) {
             return res.render("alreadyrated",{id:req.query.id});
             }
         }
-    )})
+      )
+    })
   } else {
     return res.redirect("login")
   }
 })
 
 app.post('/api/restaurant/create', function(req,res) {
-
+  new Promise(function (resolve, reject) {
+    addRestaurant(req, resolve, reject).then((data)=> {
+      console.log(data)
+      res.send({
+          status: 'ok',
+          _id: data.insertedIds[0]
+      })
+    })
+  })
 })
 
 app.get('/', function(req,res) {
@@ -373,6 +382,44 @@ app.get('/', function(req,res) {
 })
 
 app.listen(process.env.PORT || 8099)
+
+function addRestaurant(req, resolve, reject){
+  name     = req.body.name
+  cuisine  = req.body.cuisine
+  street   = req.body.street
+  building = req.body.building
+  zipcode  = req.body.zipcode
+  lon      = req.body.lon
+  lat      = req.body.lat
+  id       = req.body.id
+  photo    = req.body.photo
+  photomimetype = req.body.photomimetype
+  owner    = req.body.owner
+
+  MongoClient.connect(mongourl, function (err, db) {
+    assert.equal(err,null)
+    db.collection('restaurants').insertOne({
+       name: name,
+       cuisine: cuisine,
+       borough: null,
+       photo: photo,
+       photomimetype: photomimetype,
+       address: {
+         street: street,
+         building: building,
+         zipcode: zipcode,
+         coord: {
+           lon: lon,
+           lat: lat
+         }
+       },
+       grades: [],
+       owner: owner
+     }, function(err, docsInserted){
+       return docsInserted
+     })
+  })
+}
 
 function base64_encode(file) {
     // read binary data
