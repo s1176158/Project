@@ -24,7 +24,7 @@ app.use(cookieSession({
 
 app.get('/login', function(req,res) {
 	res.status(200)
-	res.render("login")
+	res.render("login",{msg: null})
 });
 
 app.post('/login', function(req,res) {
@@ -43,7 +43,7 @@ app.post('/login', function(req,res) {
 			}
 			if(!res.headersSent){
 				console.log("login failed")
-				res.redirect("login")
+				res.render("login",{msg: "Incorrect username or password"})
 			}
 		});
 	})
