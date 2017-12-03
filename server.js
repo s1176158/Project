@@ -119,6 +119,10 @@ app.get('/new', function(req,res) {
 
 app.post('/new', function(req,res) {
 	res.status(200)
+  if (!req.body.name || !req.session.uid)  {
+    console.log('No name')
+    return res.redirect("new")
+  }
 
   name     = req.body.name
   cuisine  = req.body.cuisine
@@ -408,6 +412,9 @@ app.post('/grade', function(req,res) {
 })
 
 app.get('/search', function(req, res){
+  if (!req.session.uid){
+    return res.redirect('/')
+  }
   name = req.query.name
   borough = req.query.borough
   cuisine = req.query.cuisine
@@ -484,7 +491,10 @@ app.get('/api/restaurant/read/:para1/:para2', function(req,res) {
 })
 
 app.get('/', function(req,res) {
-  res.redirect('/login')
+  res.status(200)
+  if(rqe.session.uid != null){
+    return res.redirect('/restaurants')
+  } else return res.redirect('/login')
 })
 
 app.listen(process.env.PORT || 8099)
