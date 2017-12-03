@@ -57,17 +57,29 @@ app.get('/signup', function(req,res) {
 app.post('/signup', function(req,res) {
 	uid = req.body.uid
 	pw = req.body.pw
+  if(!uid || !pw){
+    console.log("Null name or pw")
+    return res.redirect("signup")
+  }
 	MongoClient.connect(mongourl, function (err, db) {
 		assert.equal(err,null)
+    console.log(uid)
 		console.log('Connected to MongoDB')
-
-		db.collection('user').insertOne( { uid:uid, pw:pw } )
-		db.close()
-		console.log('Disconnected MongoDB')
-
-		res.status(200)
-    res.redirect("login")
-	})
+    db.collection('user').find({uid: uid}).count().then(function(count){
+      if (count == 0) {
+        console.log(count)
+    		db.collection('user').insertOne( { uid:uid, pw:pw }, function(err, result){
+          console.log("New Account: "+ uid)
+        	res.status(200)
+          return res.redirect("login")
+        })
+      }
+      console.log("Name already used")
+      return res.redirect("signup")
+    })
+  	db.close()
+  	console.log('Disconnected MongoDB')
+  })
 })
 
 app.get('/restaurants', function(req,res) {
