@@ -205,22 +205,39 @@ app.get('/display', function(req,res) {
 })
 
 app.get('/update', function(req,res) {
-  MongoClient.connect(mongourl, function (err, db) {
-    assert.equal(err,null)
-    console.log('Connected to MongoDB')
-    db.collection('restaurants').find( { _id: ObjectId(req.query.id) } ).toArray(
-      function(err, result){
-        assert.equal(err,null)
-        db.close()
-        console.log('Disconnected MongoDB')
-        res.status(200)
-        return res.render("update", {uid: req.session.uid, result: result})
-      }
-    )
-  })
+  if (req.session.uid != null){
+    MongoClient.connect(mongourl, function (err, db) {
+      assert.equal(err,null)
+      console.log('Connected to MongoDB')
+      db.collection('restaurants').find( { _id: ObjectId(req.query.id) } ).toArray(
+        function(err, result){
+          assert.equal(err,null)
+          db.close()
+          console.log('Disconnected MongoDB')
+          res.status(200)
+          return res.render("update", {uid: req.session.uid, result: result})
+        }
+      )
+    })
+}
+else{
+  return res.redirect("login")
+}
 })
 
 app.post('/update', function(req,res) {
+  MongoClient.connect(mongourl, function (err, db) {
+    assert.equal(err,null)
+    console.log('Connected to MongoDB')
+
+    db.collection('restaurants').find( { _id: ObjectId(req.body.id) } ).toArray(
+      function(err, result){
+
+    console.log('owner : '+result[0].owner)
+
+    if(result[0].owner == req.session.uid){
+
+
   name     = req.body.name
   cuisine  = req.body.cuisine
   borough  = req.body.borough
@@ -248,9 +265,7 @@ app.post('/update', function(req,res) {
       fs.unlink('photo/'+ photoname) //delete image in case of duplicate file name
     })
   }
-  MongoClient.connect(mongourl, function (err, db) {
-    assert.equal(err,null)
-    console.log('Connected to MongoDB')
+
 
     db.collection('restaurants').update({ _id: ObjectId(req.body.id)},{
       $set: {
@@ -273,14 +288,27 @@ app.post('/update', function(req,res) {
      function(err, result){
        assert.equal(err, null)
        if(result != null) {
+         db.close();
+         console.log('Disconnected mongoDB');
         console.log("Restaurant updated")
         return res.redirect("display?id="+req.body.id)
        }
       if(!res.headersSent){
-        console.log("Restaurants cannot be added")
+        db.close();
+        console.log('Disconnected mongoDB');
+        console.log("Restaurants cannot be updated")
         res.redirect("display?id="+req.body.id)
       }
     })
+  }
+  else{
+    console.log('Unauthorized request')
+    db.close();
+    console.log('Disconnected mongoDB');
+    res.status(200)
+    return res.render("unauthorized2",{id:req.body.id});
+  }
+})
   })
 })
 
