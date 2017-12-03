@@ -24,7 +24,7 @@ app.use(cookieSession({
 
 app.get('/login', function(req,res) {
 	res.status(200)
-	res.render("login",{msg: null})
+	res.render("login")
 });
 
 app.post('/login', function(req,res) {
@@ -43,7 +43,7 @@ app.post('/login', function(req,res) {
 			}
 			if(!res.headersSent){
 				console.log("login failed")
-				res.render("login",{msg: "Incorrect username or password"})
+				res.redirect("login")
 			}
 		});
 	})
@@ -51,7 +51,7 @@ app.post('/login', function(req,res) {
 
 app.get('/signup', function(req,res) {
 	res.status(200)
-	res.render("signup",{msg: null})
+	res.render("signup")
 })
 
 app.post('/signup', function(req,res) {
@@ -59,8 +59,7 @@ app.post('/signup', function(req,res) {
 	pw = req.body.pw
   if(!uid || !pw){
     console.log("Null name or pw")
-    return res.render("signup",{msg: "username or password missing"})
-
+    return res.redirect("signup")
   }
 	MongoClient.connect(mongourl, function (err, db) {
 		assert.equal(err,null)
@@ -79,7 +78,7 @@ app.post('/signup', function(req,res) {
         })
       } else{
         console.log("Name already used")
-        return res.render("signup",{msg: "username already exists"})
+        return res.redirect("signup")
     }
     })
   })
@@ -112,7 +111,7 @@ app.get('/restaurants', function(req,res) {
 app.get('/new', function(req,res) {
 	res.status(200)
 	if (req.session.uid != null){
-		return res.render("new",{msg: null})
+		return res.render("new")
 	} else {
 		return res.redirect("login")
 	}
@@ -120,10 +119,6 @@ app.get('/new', function(req,res) {
 
 app.post('/new', function(req,res) {
 	res.status(200)
-  if (!req.body.name || !req.session.uid)  {
-    console.log('No name')
-    return res.render("new",{msg:"Restaurant name cannot be null"})
-  }
 
   name     = req.body.name
   cuisine  = req.body.cuisine
@@ -413,9 +408,6 @@ app.post('/grade', function(req,res) {
 })
 
 app.get('/search', function(req, res){
-  if (!req.session.uid){
-    return res.redirect('/')
-  }
   name = req.query.name
   borough = req.query.borough
   cuisine = req.query.cuisine
@@ -482,7 +474,7 @@ app.get('/api/restaurant/read/:para1/:para2', function(req,res) {
           if(err != null){
             res.send({})
           }
-          res.send(result)
+          res.send(data)
         })
       })
       break;
@@ -491,37 +483,8 @@ app.get('/api/restaurant/read/:para1/:para2', function(req,res) {
   }
 })
 
-app.get('/logout', function(req,res) {
-  req.session = null
-  res.status(200)
-  res.redirect('/login')
-})
-
 app.get('/', function(req,res) {
-  res.status(200)
-  if(req.session.uid != null){
-    return res.redirect('/restaurants')
-  } else return res.redirect('/login')
-})
-
-app.get('/searcher', function(req,res) {
-  res.status(200)
-  if(req.session.uid != null){
-    return res.render('searcher')
-  } else return res.redirect('/login')
-})
-
-app.post('/searcher', function(req,res) {
-  res.status(200)
-  if(req.session.uid != null){
-    name = req.body.name
-    borough = req.body.borough
-    cuisine    = req.body.cuisine
-
-
-    return res.redirect('/search?name='+name+'&borough='+borough+'&cuisine='+cuisine)
-
-  } else return res.redirect('/login')
+  res.redirect('/login')
 })
 
 app.listen(process.env.PORT || 8099)
@@ -538,10 +501,6 @@ function addRestaurant(req, resolve, reject){
   photo    = req.body.photo
   photomimetype = req.body.photomimetype
   owner    = req.body.owner
-
-  if(!name || !owner){
-    reject("fail")
-  }
 
   MongoClient.connect(mongourl, function (err, db) {
     assert.equal(err,null)
