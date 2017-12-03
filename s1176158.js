@@ -503,6 +503,26 @@ app.get('/', function(req,res) {
   } else return res.redirect('/login')
 })
 
+app.get('/searcher', function(req,res) {
+  res.status(200)
+  if(req.session.uid != null){
+    return res.render('searcher')
+  } else return res.redirect('/login')
+})
+
+app.post('/searcher', function(req,res) {
+  res.status(200)
+  if(req.session.uid != null){
+    name = req.body.name
+    borough = req.body.borough
+    cuisine    = req.body.cuisine
+
+
+    return res.redirect('/search?name='+name+'&borough='+borough+'&cuisine='+cuisine)
+
+  } else return res.redirect('/login')
+})
+
 app.listen(process.env.PORT || 8099)
 
 function addRestaurant(req, resolve, reject){
@@ -517,7 +537,7 @@ function addRestaurant(req, resolve, reject){
   photo    = req.body.photo
   photomimetype = req.body.photomimetype
   owner    = req.body.owner
-  
+
   if(!name || !owner){
     reject("fail")
   }
