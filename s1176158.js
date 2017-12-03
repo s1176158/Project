@@ -219,7 +219,7 @@ app.get('/update', function(req,res) {
           db.close()
           console.log('Disconnected MongoDB')
           res.status(200)
-          return res.render("update", {uid: req.session.uid, result: result})
+          return res.render("update", {uid: req.session.uid, result: result, msg: null})
         }
       )
     })
@@ -254,7 +254,9 @@ app.post('/update', function(req,res) {
 
     db.collection('restaurants').find( { _id: ObjectId(req.body.id) } ).toArray(
       function(err, result){
-
+    if (!req.body.name){
+      return res.render("update", {uid: req.session.uid, result: result, msg: "Please Enter The Name of the Restaurant"})
+    }
     console.log('owner : '+result[0].owner)
 
     if(result[0].owner == req.session.uid){
