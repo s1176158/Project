@@ -490,9 +490,15 @@ app.get('/api/restaurant/read/:para1/:para2', function(req,res) {
   }
 })
 
+app.get('/logout', function(req,res) {
+  req.session = null
+  res.status(200)
+  res.redirect('/login')
+})
+
 app.get('/', function(req,res) {
   res.status(200)
-  if(rqe.session.uid != null){
+  if(req.session.uid != null){
     return res.redirect('/restaurants')
   } else return res.redirect('/login')
 })
