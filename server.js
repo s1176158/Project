@@ -367,14 +367,18 @@ app.post('/grade', function(req,res) {
 
 app.post('/api/restaurant/create', function(req,res) {
   new Promise(function (resolve, reject) {
-    addRestaurant(req, resolve, reject).then((data)=> {
-      console.log(data)
-      res.send({
-          status: 'ok',
-          _id: data.insertedIds[0]
-      })
-    })
-  })
+    addRestaurant(req, resolve, reject)
+    }).then((docsInserted) => {
+  	     console.log(docsInserted.ops)
+            res.send({
+                status: 'ok',
+                _id: docsInserted.ops[0]._id
+            })
+        }).catch(function (err) {
+            res.send({
+                status: 'failed'
+            })
+        })
 })
 
 app.get('/', function(req,res) {
@@ -398,6 +402,7 @@ function addRestaurant(req, resolve, reject){
 
   MongoClient.connect(mongourl, function (err, db) {
     assert.equal(err,null)
+
     db.collection('restaurants').insertOne({
        name: name,
        cuisine: cuisine,
@@ -416,7 +421,7 @@ function addRestaurant(req, resolve, reject){
        grades: [],
        owner: owner
      }, function(err, docsInserted){
-       return docsInserted
+       resolve(docsInserted)
      })
   })
 }
