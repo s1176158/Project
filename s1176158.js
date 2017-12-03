@@ -517,6 +517,10 @@ function addRestaurant(req, resolve, reject){
   photo    = req.body.photo
   photomimetype = req.body.photomimetype
   owner    = req.body.owner
+  
+  if(!name || !owner){
+    reject("fail")
+  }
 
   MongoClient.connect(mongourl, function (err, db) {
     assert.equal(err,null)
