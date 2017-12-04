@@ -125,7 +125,7 @@ app.post('/new', function(req,res) {
     return res.render("new",{msg:"Restaurant name cannot be null"})
   }
 
-if(!req.files.photo.mimetype.includes("image")){return res.render("new",{msg:"File is not an image!"})}
+if(req.files.photo.mimetype.includes("image")){return res.render("new",{msg:"File is not an image!"})}
   name     = req.body.name
   cuisine  = req.body.cuisine
   borough  = req.body.borough
